@@ -1,0 +1,1 @@
+# aqui ira el scraper que consume una pagina
