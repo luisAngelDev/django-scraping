@@ -1,67 +1,57 @@
-# scraper_requests.py
 import requests
 from bs4 import BeautifulSoup
-import time
 import csv
-import logging
-from requests.adapters import HTTPAdapter, Retry
+from urllib.parse import urljoin
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+URL = "https://mtpe-candidatos.empleosperu.gob.pe/search-jobs/description?jobId=0f305c24b93e48e3a34311c8249c7d1a"  # <-- pon aquí la página principal de empleos
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                  "AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/120.0.0.0 Safari/537.36"
+                  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
 }
 
-def make_session(retries=3, backoff_factor=0.5, status_forcelist=(500,502,503,504)):
-    s = requests.Session()
-    retries = Retry(total=retries,
-                    backoff_factor=backoff_factor,
-                    status_forcelist=status_forcelist,
-                    allowed_methods=["GET","POST"])
-    s.mount("https://", HTTPAdapter(max_retries=retries))
-    s.mount("http://", HTTPAdapter(max_retries=retries))
-    s.headers.update(HEADERS)
-    return s
+def safe_text(el):
+    return el.get_text(strip=True) if el else None
 
-def fetch(session, url, timeout=10):
-    logger.info("Fetching %s", url)
-    resp = session.get(url, timeout=timeout)
-    resp.raise_for_status()
-    time.sleep(1)  # pausa cortita para no spamear el servidor
-    return resp.text
+def scrape_page(url):
+    r = requests.get(url, headers=HEADERS)
+    r.raise_for_status()
+    soup = BeautifulSoup(r.text, "html.parser")
 
-def parse_list_page(html):
-    soup = BeautifulSoup(html, "html.parser")
-    items = []
-    # Ejemplo: buscar tarjetas de producto / noticias
-    for card in soup.select(".card, .news-item, .product"):
-        title = card.select_one(".title, h2, .product-title")
-        price = card.select_one(".price")
-        link = card.select_one("a")
-        items.append({
-            "title": title.get_text(strip=True) if title else None,
-            "price": price.get_text(strip=True) if price else None,
-            "link": link['href'] if link and link.has_attr('href') else None
+    jobs = []
+
+    # Cada tarjeta de empleo (ajusta la clase principal si es necesario)
+    for card in soup.select("div.list-group-item"):
+        # Títulos dentro de h6 (posición 0 = título, 1 = empresa)
+        h6s = card.find_all("h6")
+        title = safe_text(h6s[0]) if len(h6s) > 0 else None
+        empresa = safe_text(h6s[1]) if len(h6s) > 1 else None
+
+        # Extraer todos los li de los divs de detalle
+        detalles = []
+        for ul in card.find_all("ul"):
+            for li in ul.find_all("li"):
+                detalles.append(safe_text(li))
+
+        jobs.append({
+            "titulo": title,
+            "empresa": empresa,
+            "detalles": " | ".join(detalles)  # concatenamos todo en un campo
         })
-    return items
 
-def save_csv(items, filename="results.csv"):
-    keys = items[0].keys() if items else []
+    return jobs
+
+def save_csv(items, filename="trabajos.csv"):
+    keys = ["titulo", "empresa", "detalles"]
     with open(filename, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=keys)
         writer.writeheader()
         writer.writerows(items)
 
 def main():
-    session = make_session()
-    base_url = "https://ejemplo.com/listado"
-    html = fetch(session, base_url)
-    items = parse_list_page(html)
-    save_csv(items)
-    logger.info("Guardado %d items", len(items))
+    trabajos = scrape_page(URL)
+    print(f"Encontrados {len(trabajos)} trabajos")
+    save_csv(trabajos)
 
 if __name__ == "__main__":
     main()
