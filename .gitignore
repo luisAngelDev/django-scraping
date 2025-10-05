@@ -73,3 +73,4 @@ yarn-error.log*
 
 # Optional: exclude secrets if present
 secrets.json
+posiacao.py

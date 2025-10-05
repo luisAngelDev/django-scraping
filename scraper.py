@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import csv
 from urllib.parse import urljoin
 
-URL = "https://mtpe-candidatos.empleosperu.gob.pe/search-jobs/description?jobId=0f305c24b93e48e3a34311c8249c7d1a"  # <-- pon aquí la página principal de empleos
+URL = "https://mtpe-candidatos.empleosperu.gob.pe/search-jobs/description?jobId=0f305c24b93e48e3a34311c8249c7d1a"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -20,38 +20,38 @@ def scrape_page(url):
 
     jobs = []
 
-    # Cada tarjeta de empleo (ajusta la clase principal si es necesario)
-    for card in soup.select("div.list-group-item"):
-        # Títulos dentro de h6 (posición 0 = título, 1 = empresa)
-        h6s = card.find_all("h6")
-        title = safe_text(h6s[0]) if len(h6s) > 0 else None
-        empresa = safe_text(h6s[1]) if len(h6s) > 1 else None
+    # Seleccionamos todas las ofertas dentro del contenedor principal
+    for a in soup.select("div.list-group.overflow-hidden a"):
+        # Extraer título (primer h5 > ngb-highlight)
+        title_el = a.select_one("h5 ngb-highlight")
+        title = safe_text(title_el)
 
-        # Extraer todos los li de los divs de detalle
+        # Empresa (segundo ngb-highlight fuera del h5)
+        empresa_el = a.select("ngb-highlight")
+        empresa = safe_text(empresa_el[1]) if len(empresa_el) > 1 else None
+
+        # Ubicación (span debajo del subtítulo)
+        ubicacion_el = a.select_one("span")
+        ubicacion = safe_text(ubicacion_el)
+
+        # Detalles (último div con small > span)
         detalles = []
-        for ul in card.find_all("ul"):
-            for li in ul.find_all("li"):
-                detalles.append(safe_text(li))
+        small_spans = a.select("small span")
+        for s in small_spans:
+            detalles.append(safe_text(s))
+        detalles_text = " | ".join(detalles)
+
+        # Link al detalle (href del <a>)
+        link = a.get("href")
+        if link:
+            link = urljoin(url, link)
 
         jobs.append({
             "titulo": title,
             "empresa": empresa,
-            "detalles": " | ".join(detalles)  # concatenamos todo en un campo
+            "ubicacion": ubicacion,
+            "detalles": detalles_text,
+            "link": link
         })
 
     return jobs
-
-def save_csv(items, filename="trabajos.csv"):
-    keys = ["titulo", "empresa", "detalles"]
-    with open(filename, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=keys)
-        writer.writeheader()
-        writer.writerows(items)
-
-def main():
-    trabajos = scrape_page(URL)
-    print(f"Encontrados {len(trabajos)} trabajos")
-    save_csv(trabajos)
-
-if __name__ == "__main__":
-    main()
