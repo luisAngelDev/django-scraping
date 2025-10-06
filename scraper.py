@@ -55,3 +55,15 @@ def scrape_page(url):
         })
 
     return jobs
+
+
+def save_csv(items, filename="trabajos.csv"):
+    if not items:
+        print("No se encontraron trabajos.")
+        return
+    keys = items[0].keys()
+    with open(filename, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        writer.writerows(items)
+    print(f" Guardado {len(items)} trabajos en {filename}")
