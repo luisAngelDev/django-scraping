@@ -67,3 +67,14 @@ def save_csv(items, filename="trabajos.csv"):
         writer.writeheader()
         writer.writerows(items)
     print(f" Guardado {len(items)} trabajos en {filename}")
+
+
+def main():
+    trabajos = scrape_page(URL)
+    for t in trabajos[:3]:  # mostrar algunos por consola
+        print(t)
+        print("-" * 60)
+    save_csv(trabajos)
+
+if __name__ == "__main__":
+    main()
