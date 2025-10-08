@@ -3,18 +3,33 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 import time, csv
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
 
 URL = "https://mtpe-candidatos.empleosperu.gob.pe/ofertas"
 
-service = Service("chromedriver.exe")  # Ruta a tu chromedriver
-options = webdriver.ChromeOptions()
-options.add_argument("--headless")
-driver = webdriver.Chrome(service=service, options=options)
+options = Options()
+options.add_argument("--headless")  # opcional, si no quieres abrir ventana
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
 
-
+# Crear driver
+driver = webdriver.Chrome(options=options)
 driver.get(URL)
 time.sleep(5)
+
+
+# Espera hasta que haya al menos un elemento de la lista de empleos
+try:
+    WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "div.list-group.overflow-hidden a"))
+    )
+except:
+    print("No se cargaron los resultados a tiempo.")
+
+
 
 soup = BeautifulSoup(driver.page_source, "html.parser")
 
@@ -41,3 +56,11 @@ for a in soup.select("div.list-group.overflow-hidden a"):
 
 driver.quit()
 
+if jobs:
+    with open("trabajos.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=jobs[0].keys())
+        writer.writeheader()
+        writer.writerows(jobs)
+    print(f"Guardado {len(jobs)} trabajos en trabajos.csv")
+else:
+    print("No se encontraron trabajos.")
