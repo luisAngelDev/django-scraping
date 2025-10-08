@@ -1,80 +1,37 @@
-import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
-import csv
-from urllib.parse import urljoin
+import time, csv
 
-URL = "https://mtpe-candidatos.empleosperu.gob.pe/search-jobs/description?jobId=0f305c24b93e48e3a34311c8249c7d1a"
+URL = "https://mtpe-candidatos.empleosperu.gob.pe/ofertas"
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36"
-}
+service = Service("chromedriver.exe")  # Ruta a tu chromedriver
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")
+driver = webdriver.Chrome(service=service, options=options)
 
-def safe_text(el):
-    return el.get_text(strip=True) if el else None
+driver.get(URL)
+time.sleep(5)  # Esperar a que cargue el JS
 
-def scrape_page(url):
-    r = requests.get(url, headers=HEADERS)
-    r.raise_for_status()
-    soup = BeautifulSoup(r.text, "html.parser")
+soup = BeautifulSoup(driver.page_source, "html.parser")
 
-    jobs = []
+jobs = []
+for a in soup.select("div.list-group.overflow-hidden a"):
+    title_el = a.select_one("h5 ngb-highlight")
+    empresa_el = a.select("ngb-highlight")
+    empresa = empresa_el[1].get_text(strip=True) if len(empresa_el) > 1 else None
+    ubicacion = a.select_one("span").get_text(strip=True) if a.select_one("span") else None
 
-    # Seleccionamos todas las ofertas dentro del contenedor principal
-    for a in soup.select("div.list-group.overflow-hidden a"):
-        # Extraer título (primer h5 > ngb-highlight)
-        title_el = a.select_one("h5 ngb-highlight")
-        title = safe_text(title_el)
+    small_spans = a.select("small span")
+    detalles = [s.get_text(strip=True) for s in small_spans]
+    detalles_text = " | ".join(detalles)
 
-        # Empresa (segundo ngb-highlight fuera del h5)
-        empresa_el = a.select("ngb-highlight")
-        empresa = safe_text(empresa_el[1]) if len(empresa_el) > 1 else None
+    jobs.append({
+        "titulo": title_el.get_text(strip=True) if title_el else None,
+        "empresa": empresa,
+        "ubicacion": ubicacion,
+        "detalles": detalles_text,
+    })
 
-        # Ubicación (span debajo del subtítulo)
-        ubicacion_el = a.select_one("span")
-        ubicacion = safe_text(ubicacion_el)
-
-        # Detalles (último div con small > span)
-        detalles = []
-        small_spans = a.select("small span")
-        for s in small_spans:
-            detalles.append(safe_text(s))
-        detalles_text = " | ".join(detalles)
-
-        # Link al detalle (href del <a>)
-        link = a.get("href")
-        if link:
-            link = urljoin(url, link)
-
-        jobs.append({
-            "titulo": title,
-            "empresa": empresa,
-            "ubicacion": ubicacion,
-            "detalles": detalles_text,
-            "link": link
-        })
-
-    return jobs
-
-
-def save_csv(items, filename="trabajos.csv"):
-    if not items:
-        print("No se encontraron trabajos.")
-        return
-    keys = items[0].keys()
-    with open(filename, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=keys)
-        writer.writeheader()
-        writer.writerows(items)
-    print(f" Guardado {len(items)} trabajos en {filename}")
-
-
-def main():
-    trabajos = scrape_page(URL)
-    for t in trabajos[:3]:  # mostrar algunos por consola
-        print(t)
-        print("-" * 60)
-    save_csv(trabajos)
-
-if __name__ == "__main__":
-    main()
+driver.quit()
