@@ -12,11 +12,12 @@ options.add_argument("--headless")
 driver = webdriver.Chrome(service=service, options=options)
 
 driver.get(URL)
-time.sleep(5)  # Esperar a que cargue el JS
+time.sleep(5)
 
 soup = BeautifulSoup(driver.page_source, "html.parser")
 
 jobs = []
+
 for a in soup.select("div.list-group.overflow-hidden a"):
     title_el = a.select_one("h5 ngb-highlight")
     empresa_el = a.select("ngb-highlight")
@@ -33,5 +34,7 @@ for a in soup.select("div.list-group.overflow-hidden a"):
         "ubicacion": ubicacion,
         "detalles": detalles_text,
     })
+
+
 
 driver.quit()
