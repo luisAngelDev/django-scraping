@@ -80,7 +80,7 @@ if __name__ == "__main__":
     trabajos = obtener_todas_las_ofertas()
 
     if not trabajos:
-        print("⚠️ No se encontraron trabajos.")
+        print("No se encontraron trabajos.")
     else:
         # Guardar CSV (utf-8-sig para abrir bien en Excel)
         fieldnames = list(trabajos[0].keys())
@@ -93,4 +93,4 @@ if __name__ == "__main__":
         with open("trabajos.json", "w", encoding="utf-8") as f:
             json.dump(trabajos, f, ensure_ascii=False, indent=2)
 
-        print(f"✅ Guardado {len(trabajos)} trabajos en trabajos.csv y trabajos.json")
+        print(f"Guardado {len(trabajos)} trabajos en trabajos.csv y trabajos.json")
