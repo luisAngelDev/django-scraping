@@ -17,11 +17,17 @@ def obtener_ofertas_de_prueba():
 
     trabajos = []
 
+    with open("ubigeo.json", encoding="utf-8") as f:
+        ubigeos = json.load(f)
+
+    def nombre_ubigeo(codigo):
+        return ubigeos.get(codigo, codigo)
+
     trabajos.append({
     "departamento": nombre_ubigeo(location.get("DEPARTMENT")),
     "provincia": nombre_ubigeo(location.get("PROVINCE")),
     "distrito": nombre_ubigeo(location.get("DISTRICT")),
-})
+    })
 
     for job in ofertas:
         location = job.get("location") or {}
