@@ -54,6 +54,8 @@ def obtener_ofertas_de_prueba():
     return trabajos
 
 
+
+
 if __name__ == "__main__":
     trabajos = obtener_ofertas_de_prueba()
 
@@ -64,3 +66,4 @@ if __name__ == "__main__":
             json.dump(trabajos, f, ensure_ascii=False, indent=2)
 
         print(f" Guardadas {len(trabajos)} ofertas en 'trabajos_prueba.json'")
+
