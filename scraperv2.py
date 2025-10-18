@@ -10,10 +10,22 @@ def obtener_catalogos():
     resp.raise_for_status()
     data = resp.json()
 
-    loc = data.get("location", {})
-    departamentos = {d["code"]: d["name"] for d in loc.get("DEPARTMENT", [])}
-    provincias = {p["code"]: p["name"] for p in loc.get("PROVINCE", [])}
-    distritos = {d["code"]: d["name"] for d in loc.get("DISTRICT", [])}
+    location_data = data.get("location", [])
+    departamentos = {}
+    provincias = {}
+    distritos = {}
+
+    for loc in location_data:
+        level = loc.get("level")
+        code = loc.get("code")
+        name = loc.get("name")
+
+        if level == "DEPARTMENT":
+            departamentos[code] = name
+        elif level == "PROVINCE":
+            provincias[code] = name
+        elif level == "DISTRICT":
+            distritos[code] = name
 
     return departamentos, provincias, distritos
 
@@ -32,29 +44,37 @@ def combinar_ofertas_con_nombres(ofertas, departamentos, provincias, distritos):
     resultados = []
 
     for job in ofertas:
+        loc = job.get("location", {})
         resultados.append({
             "id": job.get("id"),
-            "titulo": job.get("title"),
-            "empresa": job.get("company", {}).get("name"),
-            "department": departamentos.get(job.get("department_code"), job.get("department_code")),
-            "province": provincias.get(job.get("province_code"), job.get("province_code")),
-            "district": distritos.get(job.get("district_code"), job.get("district_code")),
-            "salary_min": job.get("salary_min"),
-            "salary_max": job.get("salary_max"),
-            "date_posted": job.get("publication_date"),
+            "titulo": job.get("positionTitle"),
+            "empresa": job.get("companyName"),
+            "department": departamentos.get(loc.get("DEPARTMENT"), loc.get("DEPARTMENT")),
+            "province": provincias.get(loc.get("PROVINCE"), loc.get("PROVINCE")),
+            "district": distritos.get(loc.get("DISTRICT"), loc.get("DISTRICT")),
+            "salary_min": job.get("offeredRemunerationPackages", [{}])[0].get("minimumAmount"),
+            "salary_max": job.get("offeredRemunerationPackages", [{}])[0].get("maximumAmount"),
+            "date_posted": job.get("datePosted"),
         })
 
     return resultados
+
+
+
 
 
 if __name__ == "__main__":
     print("Descargando catálogos...")
     departamentos, provincias, distritos = obtener_catalogos()
 
-    print(" Descargando ofertas...")
+    print("Descargando ofertas...")
     ofertas = obtener_ofertas(location="lima", limit=5)
 
-    print(" Combinando resultados...")
+    print("Combinando resultados...")
     resultado_final = combinar_ofertas_con_nombres(ofertas, departamentos, provincias, distritos)
 
-    print(json.dumps(resultado_final, indent=4, ensure_ascii=False))
+    # Guardar en archivo
+    with open("ofertas_lima.json", "w", encoding="utf-8") as f:
+        json.dump(resultado_final, f, ensure_ascii=False, indent=2)
+
+    print(f"Guardadas {len(resultado_final)} ofertas en 'ofertas_lima.json'")
