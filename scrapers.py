@@ -1,6 +1,21 @@
 import requests
 import json
 
+# Cargar ubigeos al inicio
+with open("ubigeos.json", encoding="utf-8") as f:
+    UBIGEOS = json.load(f)
+
+def obtener_nombre_ubigeo(codigo):
+    """Devuelve los nombres del ubigeo según código."""
+    if not codigo:
+        return {"departamento": None, "provincia": None, "distrito": None}
+    return UBIGEOS.get(str(codigo), {
+        "departamento": None,
+        "provincia": None,
+        "distrito": None
+    })
+
+
 BASE_URL = "https://mtpe-candidatos.empleosperu.gob.pe/api/jobs"
 LIMIT = 5 
 
@@ -24,6 +39,9 @@ def obtener_ofertas_de_prueba():
         hours = job.get("hoursPerWeek") or {}
         education = job.get("educationDegree") or {}
 
+        # Buscar nombres a partir del código de distrito (nivel más específico)
+        nombres = obtener_nombre_ubigeo(location.get("DISTRICT"))
+
         salary_min = salary_max = None
         packages = job.get("offeredRemunerationPackages") or []
         if packages:
@@ -36,9 +54,9 @@ def obtener_ofertas_de_prueba():
             "titulo": job.get("positionTitle"),
             "empresa": job.get("companyName"),
             "descripcion_empresa": job.get("companyDescription"),
-            "department_code": location.get("DEPARTMENT"),
-            "province_code": location.get("PROVINCE"),
-            "district_code": location.get("DISTRICT"),
+            "departamento": nombres["departamento"],
+            "provincia": nombres["provincia"],
+            "distrito": nombres["distrito"],
             "latitude": geo.get("latitude"),
             "longitude": geo.get("longitude"),
             "contract_type": contract.get("name"),
