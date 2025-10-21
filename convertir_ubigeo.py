@@ -1,17 +1,17 @@
 import pandas as pd
 import json
 
-# Cambia este nombre por el archivo real
-archivo = "Lista_Ubigeos_INEI.csv"  # o .csv
+archivo = "Lista_Ubigeos_INEI.csv"
 
-# Leer el archivo (Excel o CSV)
+# lee el csv o xlsx
 if archivo.endswith(".xlsx"):
     df = pd.read_excel(archivo, dtype=str)
 else:
-    df = pd.read_csv(archivo, dtype=str)
+    df = pd.read_csv(archivo, dtype=str, sep=';')
 
-# Crear diccionario ubigeo
+# crea diccionario ubigeos.
 ubigeos = {}
+
 for _, row in df.iterrows():
     codigo = row["UBIGEO_INEI"].strip()
     ubigeos[codigo] = {
