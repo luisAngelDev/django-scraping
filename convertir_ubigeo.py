@@ -20,7 +20,7 @@ for _, row in df.iterrows():
         "distrito": row["DISTRITO"].strip(),
     }
 
-# Guardar en JSON
+# guardar en JSON
 with open("ubigeos.json", "w", encoding="utf-8") as f:
     json.dump(ubigeos, f, ensure_ascii=False, indent=2)
 
