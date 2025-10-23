@@ -1,9 +1,4 @@
-# import requests
-# import csv
-# import time
 
-# #BASE_URL = "https://mtpe-candidatos.empleosperu.gob.pe/api/v1/ofertas"
-# BASE_URL = "https://mtpe-candidatos.empleosperu.gob.pe/api/jobs?limit=30&offset=0"
 import requests
 import csv
 import time

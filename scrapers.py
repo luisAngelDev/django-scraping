@@ -57,8 +57,6 @@ def obtener_ofertas_de_prueba():
             "departamento": nombres["departamento"],
             "provincia": nombres["provincia"],
             "distrito": nombres["distrito"],
-            "latitude": geo.get("latitude"),
-            "longitude": geo.get("longitude"),
             "contract_type": contract.get("name"),
             "hours_per_week": hours.get("name"),
             "education_degree": education.get("name"),
