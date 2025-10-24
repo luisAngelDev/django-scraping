@@ -73,10 +73,8 @@ yarn-error.log*
 
 # Optional: exclude secrets if present
 secrets.json
-posiacao.py
 Lista_Ubigeos_INEI.csv
-trabajos.csv
 trabajos.json
 ubigeos.json
 trabajos_prueba.json
-scraper.py
+ver_json.py
