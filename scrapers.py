@@ -1,7 +1,6 @@
 import requests
 import json
 
-# Cargar ubigeos al inicio
 with open("ubigeos.json", encoding="utf-8") as f:
     UBIGEOS = json.load(f)
 
