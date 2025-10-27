@@ -3,7 +3,7 @@
 En este proyecto se recopila la lista de empleos que aparecen en la pagina del ministerio de trabajo y promocion del empleo.
 
 ## Vista previa
-![Vista previa](screenshots/trabajosMTPE.PNG.PNG)
+![Vista previa](screenshots/trabajosMTPE.PNG)
 
 ## Características
 
@@ -62,17 +62,18 @@ Sigue estos pasos para correr el proyecto en tu máquina local:
 
 ## 📂 Estructura del proyecto
 
+```plaintext
 django-scraping/
-├── 
-│── Lista_Ubigeos_INEI.csv      # Dataset auxiliar con información geográfica del Perú.
-│── convertir_ubigeo.py         # convierte la lista de ubigeos en foramto csv a json.
-├── scrapers.py                 # Script principal que ejecuta la extracción del Ministerio de trabajo.
-├── ubigeos.json                # json generado despues de leer Lista_Ubigeos_INEI.csv
-├── trabajos_prueba.json        # Archivo generado con todas las ofertas laborales
+├── .gitignore
+├── Lista_Ubigeos_INEI.csv      # Dataset auxiliar con información geográfica del Perú
+├── convertir_ubigeo.py         # Convierte el CSV de ubigeos a JSON
+├── scrapers.py                 # Script principal que extrae datos del Ministerio de Trabajo (API pública)
+├── ubigeos.json                # JSON generado desde el CSV
+├── trabajos_prueba.json        # Archivo de ejemplo con las ofertas laborales
 ├── requirements.txt            # Dependencias del proyecto
 ├── README.md                   # Este archivo
 └── venv/                       # Entorno virtual (ignorado por git)
-
+```
 
 ## 👨‍💻 Autor
 
