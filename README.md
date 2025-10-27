@@ -3,7 +3,7 @@
 En este proyecto se recopila la lista de empleos que aparecen en la pagina del ministerio de trabajo y promocion del empleo.
 
 ## Vista previa
-![Vista previa](screenshots/trabajosMTPE.PNG)
+![Vista previa](screenshots/trabajos_mtpe.png)
 
 ## Características
 
