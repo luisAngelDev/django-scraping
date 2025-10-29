@@ -43,12 +43,12 @@ Sigue estos pasos para correr el proyecto en tu máquina local:
    pip install -r requirements.txt
    ```
 
-4. Inicia el servidor:
+4. Ejecuta el archivo que lee el achivo csv:
    ```bash
    python convertir_ubigeo.py
    ```
 
-5. Inicia el servidor:
+5. Luego ejecuta scrapers.py que lee el json generado en convertir_ubigeo.py :
    ```bash
    python scrapers.py
    ```
