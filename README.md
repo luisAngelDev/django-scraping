@@ -1,6 +1,6 @@
 # web con metricas y contadores
 
-En este proyecto se recopila la lista de empleos que aparecen en la pagina del ministerio de trabajo y promocion del empleo.
+En este proyecto se recopila la lista de empleos que aparecen en la pagina del ministerio de trabajo y promocion del empleo y se cruza con un dataset de ubigeos de la plataforma de datos abiertos de peru, para obtener el lugar de la oferta laboral y mostrarlo en un json.
 
 ## Vista previa
 ![Vista previa](screenshots/trabajos_mtpe.png)
