@@ -7,6 +7,9 @@ En este proyecto se recopila la lista de empleos que aparecen en la pagina del m
 
 ## Características
 
+- Usa un dataset de ubigeos de plataforma de datos abiertos peruano.
+- Convierte esos dataset a json, y prepara un metodo para consultar departamento, provincia y distrito.
+- se pasa un codigo que se obtiene del ministerio de trabajo y devuelve los datos.
 - Consumo directo del API pública del Ministerio de Trabajo.
 - Descarga y filtrado de empleos en formato JSON.
 - Opcionalmente guarda resultados en base de datos o archivos locales.
