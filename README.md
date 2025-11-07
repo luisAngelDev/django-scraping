@@ -11,8 +11,8 @@ En este proyecto se recopila la lista de empleos que aparecen en la pagina del m
 - Convierte esos dataset a json, y prepara un metodo para consultar departamento, provincia y distrito.
 - se pasa un codigo que se obtiene del ministerio de trabajo y devuelve los datos.
 - Consumo directo del API pública del Ministerio de Trabajo.
+- cruza esa data con los codigo de ubigeos y los mescla.
 - Descarga y filtrado de empleos en formato JSON.
-- Opcionalmente guarda resultados en base de datos o archivos locales.
 - si quitas el atributo LIMIT trae alrededor de 1500 ofertas laborales.
 
 
